@@ -11,7 +11,7 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            /* Remove overflow: hidden on body to allow scrolling */
             background-color: #0d0a1b; /* Dark base color */
         }
 
@@ -25,11 +25,11 @@
             z-index: -100;
         }
 
-        /* Container for the foreground content */
+        /* Container for the foreground content - Must be 100vh to ensure scrolling starts */
         .content-overlay {
             position: relative;
             z-index: 1; /* Place above the canvas */
-            height: 100vh;
+            height: 100vh; /* This sets the height of the hero section to the viewport height */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -50,7 +50,7 @@
     <!-- Background Canvas Element for Animation -->
     <canvas id="data-canvas"></canvas>
 
-    <!-- Foreground Content -->
+    <!-- 1. Hero Content (First View) -->
     <div class="content-overlay">
         <div class="max-w-4xl p-8 bg-black bg-opacity-40 backdrop-blur-sm rounded-xl shadow-2xl transition duration-500 hover:bg-opacity-50">
             <h1 class="text-6xl md:text-8xl font-extrabold mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
@@ -59,11 +59,60 @@
             <p class="text-xl md:text-2xl font-light text-gray-100 mb-8">
                 Unlocking potential through visionary data architecture. Confidence is built here.
             </p>
-            <button class="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-semibold rounded-lg shadow-xl hover:shadow-cyan-400/50 transition duration-300 transform hover:scale-105 hover:from-cyan-400 hover:to-purple-400">
+            <!-- BUTTON: Now an anchor tag linked to the #contact section -->
+            <a href="#contact" id="innovate-button" class="inline-block px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-semibold rounded-lg shadow-xl hover:shadow-cyan-400/50 transition duration-300 transform hover:scale-105 hover:from-cyan-400 hover:to-purple-400">
                 Innovate Now
-            </button>
+            </a>
         </div>
     </div>
+
+    <!-- 2. Scroll-Down Content (Form Section) -->
+    <!-- Added a new section that forces scrolling -->
+    <section id="contact" class="min-h-screen pt-16 pb-24 bg-gray-900 border-t border-gray-800 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl w-full text-center">
+            <h2 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-4">
+                Let's Build the Future
+            </h2>
+            <p class="text-lg text-gray-400 mb-12">
+                Tell us about your project and we'll connect you with our data architects.
+            </p>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="w-full max-w-3xl bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl">
+            <form action="#" method="POST" class="space-y-6">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-300 text-left mb-2">Full Name</label>
+                    <input type="text" name="name" id="name" required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-purple-500 focus:border-purple-500 transition duration-150"
+                        placeholder="John Doe">
+                </div>
+                
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-300 text-left mb-2">Work Email</label>
+                    <input type="email" name="email" id="email" required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-purple-500 focus:border-purple-500 transition duration-150"
+                        placeholder="you@company.com">
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-300 text-left mb-2">Project Details</label>
+                    <textarea id="message" name="message" rows="4" required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-purple-500 focus:border-purple-500 transition duration-150"
+                        placeholder="Briefly describe your data or AI goals..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                    class="w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg shadow-lg hover:shadow-pink-400/50 transition duration-300 transform hover:scale-[1.01]">
+                    Submit for Analysis
+                </button>
+            </form>
+        </div>
+    </section>
 
     <script>
         const canvas = document.getElementById('data-canvas');
@@ -73,13 +122,13 @@
         
         // Configuration for the particle effect
         const config = {
-            particleCount: 200, // Increased to 200 nodes
+            particleCount: 200, // Nodes: 200
             particleColor: 'rgba(255, 255, 255, 0.8)',
             lineColor: 'rgba(70, 130, 180, 0.2)', 
-            maxRadius: 2.5, // Increased by 25% (was 2)
-            minRadius: 0.625, // Increased by 25% (was 0.5)
-            maxSpeed: 0.5,
-            lineDistance: 100 // Distance for connecting lines
+            maxRadius: 2.5, 
+            minRadius: 0.625, 
+            maxSpeed: 1.0, 
+            lineDistance: 200 // Connection Distance: Increased by 100%
         };
 
         // Particle Class definition
@@ -135,7 +184,8 @@
 
         // Draw connecting lines between nearby particles
         function drawLines() {
-            const d = config.lineDistance * config.lineDistance; // distance squared
+            // Uses lineDistance squared for efficient distance calculation
+            const d = config.lineDistance * config.lineDistance; 
 
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
@@ -175,6 +225,23 @@
             });
         }
 
+        // Smooth Scrolling Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('innovate-button');
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); // Stop the default jump behavior
+                const targetId = e.currentTarget.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    // Use modern smooth scroll behavior
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
         // Start everything
         window.onload = function () {
             // Initialize dimensions and particles once
@@ -190,3 +257,4 @@
 
 </body>
 </html>
+
