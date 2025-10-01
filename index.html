@@ -37,7 +37,6 @@
             text-align: center;
             color: white; /* White text for contrast */
             padding: 2rem;
-            /* No background opacity needed as the canvas is already dark */
         }
 
         /* Ensure smooth animation on text */
@@ -74,7 +73,7 @@
         
         // Configuration for the particle effect
         const config = {
-            particleCount: 150, // INCREASED by 50% from 100
+            particleCount: 150,
             particleColor: 'rgba(255, 255, 255, 0.8)',
             lineColor: 'rgba(70, 130, 180, 0.2)', // Steel Blue, transparent
             maxRadius: 2,
@@ -83,27 +82,18 @@
             lineDistance: 100 // Distance for connecting lines
         };
 
-        // Resize handler to make canvas full screen and adjust particle positions
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            // Always re-initialize particles on resize to ensure they fill the new dimensions
-            // and prevent them from being constrained to the old bounds.
-            initParticles(); 
-        }
-
         // Particle Class definition
         class Particle {
             constructor() {
+                // IMPORTANT: Ensure particles are created within the current canvas dimensions
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.radius = Math.random() * (config.maxRadius - config.minRadius) + config.minRadius;
-                this.vx = (Math.random() - 0.5) * config.maxSpeed; // velocity x
-                this.vy = (Math.random() - 0.5) * config.maxSpeed; // velocity y
+                this.vx = (Math.random() - 0.5) * config.maxSpeed; 
+                this.vy = (Math.random() - 0.5) * config.maxSpeed; 
                 this.color = config.particleColor;
             }
 
-            // Draw the particle
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -111,17 +101,15 @@
                 ctx.fill();
             }
 
-            // Update the particle's position and handle boundaries
             update() {
                 // Move the particle
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Bounce off edges (or wrap around)
+                // Bounce off edges 
                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
                 
-                // Draw the particle in its new position
                 this.draw();
             }
         }
@@ -132,6 +120,17 @@
             for (let i = 0; i < config.particleCount; i++) {
                 particles.push(new Particle());
             }
+        }
+
+        // Resize handler to make canvas full screen and adjust particle positions (FIXED)
+        function resizeCanvas() {
+            // 1. Set canvas dimensions
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // 2. Re-initialize particles AFTER dimensions are set
+            // This guarantees they are spread across the new, larger/smaller screen.
+            initParticles(); 
         }
 
         // Draw connecting lines between nearby particles
@@ -165,7 +164,8 @@
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
 
-            // Clear canvas using solid color to remove trails/streaks (FIXED)
+            // Clear canvas using solid, opaque color (FIXED: Eliminated transparency)
+            // Note: The color is pulled from the CSS body background (#0d0a1b)
             ctx.fillStyle = '#0d0a1b'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -176,10 +176,15 @@
             });
         }
 
-        // Start everything
+        // Start everything (Simplified startup process)
         window.onload = function () {
-            resizeCanvas();
+            // Initialize dimensions and particles once
+            resizeCanvas(); 
+            
+            // Start listening for future resizing
             window.addEventListener('resize', resizeCanvas);
+            
+            // Start the loop
             animate();
         };
     </script>
