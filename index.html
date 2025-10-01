@@ -73,11 +73,11 @@
         
         // Configuration for the particle effect
         const config = {
-            particleCount: 150,
+            particleCount: 200, // Increased to 200 nodes
             particleColor: 'rgba(255, 255, 255, 0.8)',
-            lineColor: 'rgba(70, 130, 180, 0.2)', // Steel Blue, transparent
-            maxRadius: 2,
-            minRadius: 0.5,
+            lineColor: 'rgba(70, 130, 180, 0.2)', 
+            maxRadius: 2.5, // Increased by 25% (was 2)
+            minRadius: 0.625, // Increased by 25% (was 0.5)
             maxSpeed: 0.5,
             lineDistance: 100 // Distance for connecting lines
         };
@@ -88,6 +88,7 @@
                 // IMPORTANT: Ensure particles are created within the current canvas dimensions
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
+                // Particle size based on new max/min radius config
                 this.radius = Math.random() * (config.maxRadius - config.minRadius) + config.minRadius;
                 this.vx = (Math.random() - 0.5) * config.maxSpeed; 
                 this.vy = (Math.random() - 0.5) * config.maxSpeed; 
@@ -122,14 +123,13 @@
             }
         }
 
-        // Resize handler to make canvas full screen and adjust particle positions (FIXED)
+        // Resize handler to make canvas full screen and adjust particle positions
         function resizeCanvas() {
             // 1. Set canvas dimensions
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
             // 2. Re-initialize particles AFTER dimensions are set
-            // This guarantees they are spread across the new, larger/smaller screen.
             initParticles(); 
         }
 
@@ -164,8 +164,7 @@
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
 
-            // Clear canvas using solid, opaque color (FIXED: Eliminated transparency)
-            // Note: The color is pulled from the CSS body background (#0d0a1b)
+            // Clear canvas using solid, opaque color 
             ctx.fillStyle = '#0d0a1b'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -176,7 +175,7 @@
             });
         }
 
-        // Start everything (Simplified startup process)
+        // Start everything
         window.onload = function () {
             // Initialize dimensions and particles once
             resizeCanvas(); 
