@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Background Webpage</title>
+    <title>AI Data Nexus Background</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Use Inter font */
@@ -11,31 +11,24 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent body scroll */
+            overflow: hidden;
+            background-color: #0d0a1b; /* Dark base color */
         }
 
-        /* * 1. Position the video fixed to the background.
-         * 2. Use min-width/min-height 100% to ensure it covers the viewport.
-         * 3. object-fit: cover ensures the video covers the entire area while maintaining its aspect ratio.
-         */
-        #video-background {
+        /* Full-screen Canvas for the animation */
+        #data-canvas {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -100; /* Place behind all content */
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            filter: brightness(0.7); /* Slightly darken the video for better text contrast */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -100;
         }
 
         /* Container for the foreground content */
         .content-overlay {
             position: relative;
-            z-index: 1; /* Place above the video */
+            z-index: 1; /* Place above the canvas */
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -44,33 +37,160 @@
             text-align: center;
             color: white; /* White text for contrast */
             padding: 2rem;
-            background-color: rgba(0, 0, 0, 0.1); /* Slight overlay for readability */
+            /* No background opacity needed as the canvas is already dark */
+        }
+
+        /* Ensure smooth animation on text */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
 <body>
 
-    <!-- Background Video Element -->
-    <video id="video-background" preload="auto" loop muted autoplay playsinline>
-        <!-- SOURCE UPDATED to use the local file path -->
-        <source src="background_connections.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <!-- Background Canvas Element for Animation -->
+    <canvas id="data-canvas"></canvas>
 
     <!-- Foreground Content -->
     <div class="content-overlay">
-        <div class="max-w-4xl p-8 bg-black bg-opacity-40 backdrop-blur-sm rounded-xl shadow-2xl">
-            <h1 class="text-6xl md:text-8xl font-extrabold mb-4 tracking-tighter">
+        <div class="max-w-4xl p-8 bg-black bg-opacity-40 backdrop-blur-sm rounded-xl shadow-2xl transition duration-500 hover:bg-opacity-50">
+            <h1 class="text-6xl md:text-8xl font-extrabold mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
                 THE NEXUS
             </h1>
-            <p class="text-xl md:text-2xl font-light text-gray-200 mb-8">
-                Experience the seamless connection and fluid data flow. This dynamic background is created using your provided video file.
+            <p class="text-xl md:text-2xl font-light text-gray-100 mb-8">
+                Unlocking potential through visionary data architecture. Confidence is built here.
             </p>
-            <button class="px-8 py-3 bg-white text-gray-900 text-lg font-semibold rounded-lg shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
-                Explore The Grid
+            <button class="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-semibold rounded-lg shadow-xl hover:shadow-cyan-400/50 transition duration-300 transform hover:scale-105 hover:from-cyan-400 hover:to-purple-400">
+                Innovate Now
             </button>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('data-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+        
+        // Configuration for the particle effect
+        const config = {
+            particleCount: 100,
+            particleColor: 'rgba(255, 255, 255, 0.8)',
+            lineColor: 'rgba(70, 130, 180, 0.2)', // Steel Blue, transparent
+            maxRadius: 2,
+            minRadius: 0.5,
+            maxSpeed: 0.5,
+            lineDistance: 100 // Distance for connecting lines
+        };
+
+        // Resize handler to make canvas full screen and adjust particle positions
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Reset particles on resize to prevent them bunching up
+            if (particles.length === 0) {
+                initParticles();
+            } else {
+                // Adjust positions to new dimensions if necessary
+                particles.forEach(p => {
+                    p.x = Math.min(p.x, canvas.width);
+                    p.y = Math.min(p.y, canvas.height);
+                });
+            }
+        }
+
+        // Particle Class definition
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * (config.maxRadius - config.minRadius) + config.minRadius;
+                this.vx = (Math.random() - 0.5) * config.maxSpeed; // velocity x
+                this.vy = (Math.random() - 0.5) * config.maxSpeed; // velocity y
+                this.color = config.particleColor;
+            }
+
+            // Draw the particle
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            // Update the particle's position and handle boundaries
+            update() {
+                // Move the particle
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges (or wrap around)
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                
+                // Draw the particle in its new position
+                this.draw();
+            }
+        }
+
+        // Initialize particles
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < config.particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // Draw connecting lines between nearby particles
+        function drawLines() {
+            const d = config.lineDistance * config.lineDistance; // distance squared
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist2 = dx * dx + dy * dy;
+
+                    if (dist2 < d) {
+                        const alpha = 1 - (dist2 / d); // Opacity based on distance
+
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(135, 206, 250, ${alpha * 0.3})`; // Light blue/cyan lines
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Main animation loop
+        function animate() {
+            animationFrameId = requestAnimationFrame(animate);
+
+            // Clear canvas (using a slight opacity to create subtle trails)
+            ctx.fillStyle = 'rgba(13, 10, 27, 0.1)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawLines();
+
+            particles.forEach(particle => {
+                particle.update();
+            });
+        }
+
+        // Start everything
+        window.onload = function () {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            initParticles();
+            animate();
+        };
+    </script>
 
 </body>
 </html>
