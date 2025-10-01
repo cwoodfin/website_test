@@ -1,3 +1,6 @@
+# GitHub Pages link 
+https://cwoodfin.github.io/website_test/
+
 # Step 1
 
 That's a smart move! Using index.html is the standard practice, as web servers automatically look for that filename when someone visits the base domain.
