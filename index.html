@@ -74,7 +74,7 @@
         
         // Configuration for the particle effect
         const config = {
-            particleCount: 100,
+            particleCount: 150, // INCREASED by 50% from 100
             particleColor: 'rgba(255, 255, 255, 0.8)',
             lineColor: 'rgba(70, 130, 180, 0.2)', // Steel Blue, transparent
             maxRadius: 2,
@@ -87,16 +87,9 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Reset particles on resize to prevent them bunching up
-            if (particles.length === 0) {
-                initParticles();
-            } else {
-                // Adjust positions to new dimensions if necessary
-                particles.forEach(p => {
-                    p.x = Math.min(p.x, canvas.width);
-                    p.y = Math.min(p.y, canvas.height);
-                });
-            }
+            // Always re-initialize particles on resize to ensure they fill the new dimensions
+            // and prevent them from being constrained to the old bounds.
+            initParticles(); 
         }
 
         // Particle Class definition
@@ -172,8 +165,8 @@
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
 
-            // Clear canvas (using a slight opacity to create subtle trails)
-            ctx.fillStyle = 'rgba(13, 10, 27, 0.1)'; 
+            // Clear canvas using solid color to remove trails/streaks (FIXED)
+            ctx.fillStyle = '#0d0a1b'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             drawLines();
@@ -187,7 +180,6 @@
         window.onload = function () {
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
-            initParticles();
             animate();
         };
     </script>
