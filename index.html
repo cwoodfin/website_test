@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Background Webpage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* * 1. Position the video fixed to the background.
+         * 2. Use min-width/min-height 100% to ensure it covers the viewport.
+         * 3. object-fit: cover ensures the video covers the entire area while maintaining its aspect ratio.
+         */
+        #video-background {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; /* Place behind all content */
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.7); /* Slightly darken the video for better text contrast */
+        }
+
+        /* Container for the foreground content */
+        .content-overlay {
+            position: relative;
+            z-index: 1; /* Place above the video */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white; /* White text for contrast */
+            padding: 2rem;
+            background-color: rgba(0, 0, 0, 0.1); /* Slight overlay for readability */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video Element -->
+    <video id="video-background" preload="auto" loop muted autoplay playsinline>
+        <!-- Updated to use the external URL you provided -->
+        <source src="https://ai4ra.uidaho.edu/wp-content/uploads/2025/02/144581-785095778_medium.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Foreground Content -->
+    <div class="content-overlay">
+        <div class="max-w-4xl p-8 bg-black bg-opacity-40 backdrop-blur-sm rounded-xl shadow-2xl">
+            <h1 class="text-6xl md:text-8xl font-extrabold mb-4 tracking-tighter">
+                THE NEXUS
+            </h1>
+            <p class="text-xl md:text-2xl font-light text-gray-200 mb-8">
+                Experience the seamless connection and fluid data flow. This dynamic background is created using your provided video file.
+            </p>
+            <button class="px-8 py-3 bg-white text-gray-900 text-lg font-semibold rounded-lg shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
+                Explore The Grid
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>
